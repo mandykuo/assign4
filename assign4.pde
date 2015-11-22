@@ -396,15 +396,6 @@ void draw() {
           }
 
           
-          
-          
-
-          
-          
-
-          
-        
-
 
         if (enemyX>=900) {
           enemyRun=ENEMY_RUN1;
