@@ -40,12 +40,18 @@ int enemyY;
 
 int[]R1EnemyX =new int[5];
 int[]R1EnemyY =new int[5];
+int[]R1EnemyYFlame =new int[5];
 int[]R2EnemyX =new int[5];
 int[]R2EnemyY =new int[5];
+int[]R2EnemyYFlame =new int[5];
 int[]R3EnemyX =new int[5];
 int[]R3EnemyY1 =new int[5];
+int[]R3EnemyY1Flame =new int[5];
 int[]R3EnemyY2 =new int[5];
+int[]R3EnemyY2Flame =new int[5];
 int[]R3EnemyY3 =new int[5];
+int[]R3EnemyY3Flame =new int[5];
+
 
 PImage enemy, fighter, treasure, hp_bar, bg1, bg2, 
   start_light, start_dark, end_light, end_dark;
@@ -53,12 +59,6 @@ PImage enemy, fighter, treasure, hp_bar, bg1, bg2,
 int numFrames = 5;
 int curFlame;
 PImage []flame=new PImage [numFrames];
-
-
-
-float crashX = -100;
-float crashY = -100;
-int counter =0;
 
 void setup () {
 
@@ -152,16 +152,11 @@ void draw() {
     break; 
 
   case GAME_READY: //replace HP and fighter
-    image(bg2, 0, 0);
-    blood=0;
-    fighterX=590;
-    fighterY=240;
-    for (int i=0; i<5; i++) {
-      R1EnemyX[i]=enemyX-i*65;
-      R1EnemyY[i]=enemyY;
-      //image(enemy, R1EnemyX[i], R1EnemyY[i]);
-    }
-    gameState=GAME_RUN;
+  image(bg2,0,0);
+  blood=0;
+  fighterX=590;
+  fighterY=240;
+  gameState=GAME_RUN;
 
 
   case GAME_RUN:
@@ -177,7 +172,6 @@ void draw() {
 
     case ENEMY_RUN1:
 
-      //boundary detection
       if (enemyY>height-50) {
         enemyY=height-50;
       }
@@ -187,45 +181,53 @@ void draw() {
 
       for (int i=0; i<5; i++) {
         R1EnemyX[i]=enemyX-i*65;
-        //R1EnemyY[i]=enemyY;
-        image(enemy, R1EnemyX[i], R1EnemyY[i]);
+
+        if (R1EnemyY[i]!=1000) {
+          R1EnemyY[i]=enemyY;
+          image(enemy, R1EnemyX[i], R1EnemyY[i]);
+          if (fighterX < R1EnemyX[i]+enemyW &&
+            R1EnemyX[i] < fighterX+fighterW &&
+            fighterY < R1EnemyY[i]+enemyH &&
+            R1EnemyY[i] < fighterY + fighterH) {
+            println("1");
+
+            // image(flame[curFlame], R1EnemyX[i], R1EnemyY[i]);
+            // if ((frameCount) % 30 ==0) {
+
+            //   curFlame = (curFlame ++)% numFlame; 
+            //   if (curFlame>4) {
+            //     curFlame=0;
+            //   }
+
+              blood-=40;
+              R1EnemyY[i]=1000;
+            // }
+          }
+        }
+        else{
+          println("curFlame: "+curFlame);
+          if (R1EnemyYFlame[i] != 5) {
+            image(flame[R1EnemyYFlame[i]], R1EnemyX[i], enemyY);  
+          }
+          if (frameCount % 10 ==0) {
+            // println("frameCount: "+frameCount);
+            if (R1EnemyYFlame[i] != 5) {
+              R1EnemyYFlame[i]++;
+            }
+            // println("curFlame: "+curFlame);
+            // curFlame = curFlame % numFlame; 
+            
+          }
+        }
       }
-
-      for (int i = 0; i<5; i++)
-      {
-        if (fighterX < R1EnemyX[i]+enemyW &&
-          R1EnemyX[i] < fighterX+fighterW &&
-          fighterY < R1EnemyY[i]+enemyH &&
-          R1EnemyY[i] < fighterY + fighterH) 
-        {
-          crashY = R1EnemyY[i];
-          crashX = R1EnemyX[i];
-          println("1");
-          blood-=40;
-          R1EnemyY[i]=-1000;
-        }
-        image(flame[curFlame], crashX, crashY);
-
-        counter++;
-        if (counter>60) {
-          curFlame++;
-          counter = 0;
-        }
-        if (curFlame > 4) {
-          crashX = -100;
-          crashY = -100;
-          curFlame = 0;
-        }
-      }
-
       if (enemyX >= 900) {
+        enemyRun=ENEMY_RUN2;
         enemyX=0;
         enemyY=floor(random(50, 200));
-        enemyRun=ENEMY_RUN2;
-        for (int i=0; i<5; i++) 
-        {
-          R2EnemyX[i]=enemyX-i*65;
-          R2EnemyY[i]=enemyY+i*40;
+        for (int i=0; i<5; i++) {
+          R2EnemyX[i]=0;
+          R2EnemyY[i]=floor(random(420));
+          R2EnemyYFlame[i] = 0;
         }
       }
 
@@ -251,27 +253,26 @@ void draw() {
             R2EnemyX[i] < fighterX+fighterW &&
             fighterY < R2EnemyY[i]+enemyH &&
             R2EnemyY[i] < fighterY + fighterH) {
-
-            crashY = R2EnemyY[i];
-            crashX = R2EnemyX[i];
-
             println("2");
-
             blood-=40;
             R2EnemyY[i]=1000;
-
-            image(flame[curFlame], crashX, crashY);
-
-            counter++;
-            if (counter>60) {
-              curFlame++;
-              counter = 0;
+            
+          }
+        }
+        else
+        {
+          // println("curFlame: "+curFlame);
+          if (R2EnemyYFlame[i] != 5) {
+            image(flame[R2EnemyYFlame[i]], R2EnemyX[i], enemyY+i*40);  
+          }
+          if (frameCount % 10 ==0) {
+            // println("frameCount: "+frameCount);
+            if (R2EnemyYFlame[i] != 5) {
+              R2EnemyYFlame[i]++;
             }
-            if (curFlame > 4) {
-              crashX = -100;
-              crashY = -100;
-              curFlame = 0;
-            }
+            // println("curFlame: "+curFlame);
+            // curFlame = curFlame % numFlame; 
+            
           }
         }
       }
@@ -281,8 +282,12 @@ void draw() {
         enemyX=0;
         enemyY=floor(random(100, 300));
 
+
         for (int i=0; i<5; i++) {
           R3EnemyX[i]=enemyX-i*60;
+          R3EnemyY1Flame[i] = 0;
+          R3EnemyY2Flame[i] = 0;
+          R3EnemyY3Flame[i] = 0;
           if (i == 0 || i == 4) {
             R3EnemyY1[i]=enemyY;
           } else if (i == 1 || i == 3) {
@@ -318,27 +323,34 @@ void draw() {
               R3EnemyX[i] < fighterX+fighterW &&
               fighterY < R3EnemyY1[i]+enemyH &&
               R3EnemyY1[i] < fighterY + fighterH) {
-
-              crashY = R3EnemyY1[i];
-              crashX = R3EnemyX[i];
-
               println("3");
 
-              blood-=40;
-              R3EnemyY1[i]=1000;
+              // image(flame[curFlame], R3EnemyX[i], R3EnemyY1[i]);
+              // if (frameCount % (60/10)==0) {
 
-              image(flame[curFlame], crashX, crashY);
+              //   curFlame = (curFlame ++)% numFlame; 
+              //   if (curFlame>4) {
+              //     curFlame=0;
+              //   }
 
-              counter++;
-              if (counter>60) {
-                curFlame++;
-                counter = 0;
+                blood-=40;
+                R3EnemyY1[i]=1000;
+              // }
+            }
+          }
+          else {
+            // println("curFlame: "+curFlame);
+            if (R3EnemyY1Flame[i] != 5) {
+              image(flame[R3EnemyY1Flame[i]], R3EnemyX[i], enemyY);  
+            }
+            if (frameCount % 10 ==0) {
+              // println("frameCount: "+frameCount);
+              if (R3EnemyY1Flame[i] != 5) {
+                R3EnemyY1Flame[i]++;
               }
-              if (curFlame > 4) {
-                crashX = -100;
-                crashY = -100;
-                curFlame = 0;
-              }
+              // println("curFlame: "+curFlame);
+              // curFlame = curFlame % numFlame; 
+              
             }
           }
         } else if (i == 1 || i == 3) {
@@ -350,27 +362,34 @@ void draw() {
               R3EnemyX[i] < fighterX+fighterW &&
               fighterY < R3EnemyY2[i]+enemyH &&
               R3EnemyY2[i] < fighterY + fighterH) {
-
-              crashY = R3EnemyY2[i];
-              crashX = R3EnemyX[i];
-
               println("4");
 
-              blood-=40;
-              R3EnemyY2[i]=1000;
+              // image(flame[curFlame], R3EnemyX[i], R3EnemyY2[i]);
+              // if (frameCount % (60/10)==0) {
 
-              image(flame[curFlame], crashX, crashY);
+              //   curFlame = (curFlame ++)% numFlame; 
+              //   if (curFlame>4) {
+              //     curFlame=0;
+              //   }
 
-              counter++;
-              if (counter>60) {
-                curFlame++;
-                counter = 0;
+                blood-=40;
+                R3EnemyY2[i]=1000;
+              // }
+            }
+          }
+          else {
+            // println("curFlame: "+curFlame);
+            if (R3EnemyY2Flame[i] != 5) {
+              image(flame[R3EnemyY2Flame[i]], R3EnemyX[i], enemyY+1*40);  
+            }
+            if (frameCount % 10 ==0) {
+              // println("frameCount: "+frameCount);
+              if (R3EnemyY2Flame[i] != 5) {
+                R3EnemyY2Flame[i]++;
               }
-              if (curFlame > 4) {
-                crashX = -100;
-                crashY = -100;
-                curFlame = 0;
-              }
+              // println("curFlame: "+curFlame);
+              // curFlame = curFlame % numFlame; 
+              
             }
           }
           if (R3EnemyY2[i+1] != 1000) {
@@ -379,31 +398,41 @@ void draw() {
               R3EnemyX[i] < fighterX+fighterW &&
               fighterY < R3EnemyY2[i+1]+enemyH &&
               R3EnemyY2[i+1] < fighterY + fighterH) {
-
-              crashY = R3EnemyY2[i];
-              crashX = R3EnemyX[i];
-
               println("4");
 
-              blood-=40;
-              R3EnemyY2[i+1]=1000;
+              image(flame[curFlame], R3EnemyX[i], R3EnemyY2[i+1]);
+              if (frameCount % (60/10)==0) {
 
-              image(flame[curFlame], crashX, crashY);
+                curFlame = (curFlame ++)% numFlame; 
+                if (curFlame>4) {
+                  curFlame=0;
+                }
 
-              counter++;
-              if (counter>60) {
-                curFlame++;
-                counter = 0;
-              }
-              if (curFlame > 4) {
-                crashX = -100;
-                crashY = -100;
-                curFlame = 0;
+                blood-=40;
+                R3EnemyY2[i+1]=1000;
               }
             }
           }
+          else {
+            // println("curFlame: "+curFlame);
+            if (R3EnemyY2Flame[i] != 5) {
+              image(flame[R3EnemyY2Flame[i]], R3EnemyX[i], enemyY-1*40);  
+            }
+            if (frameCount % 10 ==0) {
+              // println("frameCount: "+frameCount);
+              if (R3EnemyY2Flame[i] != 5) {
+                R3EnemyY2Flame[i]++;
+              }
+              // println("curFlame: "+curFlame);
+              // curFlame = curFlame % numFlame; 
+              
+            }
+          }
+
+          
           // image(enemy, R3EnemyX[i], R3EnemyY3[i]);
-        } else {
+        } 
+        else {
           // image(enemy, R3EnemyX[i], R3EnemyY2[i]);
           image(enemy, R3EnemyX[i], R3EnemyY3[i]);
           image(enemy, R3EnemyX[i], R3EnemyY3[i+1]);
@@ -414,27 +443,34 @@ void draw() {
               R3EnemyX[i] < fighterX+fighterW &&
               fighterY < R3EnemyY3[i]+enemyH &&
               R3EnemyY3[i] < fighterY + fighterH) {
-
-              crashY = R3EnemyY3[i];
-              crashX = R3EnemyX[i];
-
               println("5");
 
-              blood-=40;
-              R3EnemyY3[i]=1000;
+              // image(flame[curFlame], R3EnemyX[i], R3EnemyY3[i]);
+              // if (frameCount % (60/10)==0) {
 
-              image(flame[curFlame], crashX, crashY);
+              //   curFlame = (curFlame ++)% numFlame; 
+              //   if (curFlame>4) {
+              //     curFlame=0;
+              //   }
 
-              counter++;
-              if (counter>60) {
-                curFlame++;
-                counter = 0;
+                blood-=40;
+                R3EnemyY3[i]=1000;
+              // }
+            }
+          }
+          else {
+            // println("curFlame: "+curFlame);
+            if (R3EnemyY3Flame[i] != 5) {
+              image(flame[R3EnemyY3Flame[i]], R3EnemyX[i], enemyY+2*40);  
+            }
+            if (frameCount % 10 ==0) {
+              // println("frameCount: "+frameCount);
+              if (R3EnemyY3Flame[i] != 5) {
+                R3EnemyY3Flame[i]++;
               }
-              if (curFlame > 4) {
-                crashX = -100;
-                crashY = -100;
-                curFlame = 0;
-              }
+              // println("curFlame: "+curFlame);
+              // curFlame = curFlame % numFlame; 
+              
             }
           }
           if (R3EnemyY3[i+1] != 1000) {
@@ -443,27 +479,34 @@ void draw() {
               R3EnemyX[i] < fighterX+fighterW &&
               fighterY < R3EnemyY3[i+1]+enemyH &&
               R3EnemyY3[i+1] < fighterY + fighterH) {
-
-              crashY = R3EnemyY3[i];
-              crashX = R3EnemyX[i];
-
               println("5");
 
-              blood-=40;
-              R3EnemyY3[i+1]=1000;
+              // image(flame[curFlame], R3EnemyX[i], R3EnemyY3[i+1]);
+              // if (frameCount % (60/10)==0) {
 
-              image(flame[curFlame], crashX, crashY);
+              //   curFlame = (curFlame ++)% numFlame; 
+              //   if (curFlame>4) {
+              //     curFlame=0;
+              //   }
 
-              counter++;
-              if (counter>60) {
-                curFlame++;
-                counter = 0;
+                blood-=40;
+                R3EnemyY3[i+1]=1000;
+              // }
+            }
+          }
+          else {
+            // println("curFlame: "+curFlame);
+            if (R3EnemyY3Flame[i] != 5) {
+              image(flame[R3EnemyY3Flame[i]], R3EnemyX[i], enemyY-2*40);  
+            }
+            if (frameCount % 10 ==0) {
+              // println("frameCount: "+frameCount);
+              if (R3EnemyY3Flame[i] != 5) {
+                R3EnemyY3Flame[i]++;
               }
-              if (curFlame > 4) {
-                crashX = -100;
-                crashY = -100;
-                curFlame = 0;
-              }
+              // println("curFlame: "+curFlame);
+              // curFlame = curFlame % numFlame; 
+              
             }
           }
         }
@@ -474,11 +517,10 @@ void draw() {
           enemyRun=ENEMY_RUN1;
           enemyX=0;
           enemyY=floor(random(240, 360));
-
           for (int j=0; j<5; j++) {
-            R1EnemyX[j]=enemyX-j*65;
-            R1EnemyY[j]=enemyY;
-            //image(enemy, R1EnemyX[i], R1EnemyY[i]);
+            R1EnemyX[j]=0;
+            R1EnemyY[j]=floor(random(420));
+            R1EnemyYFlame[j] = 0;
           }
         }
       }
@@ -553,16 +595,21 @@ case GAME_WIN:
         for (int i=0; i<5; i++) {
           R1EnemyX[i]=0;
           R1EnemyY[i]=floor(random(420));
+          R1EnemyYFlame[i] = 0;
         }
 
         for (int i=0; i<5; i++) {
           R2EnemyX[i]=0;
           R2EnemyY[i]=floor(random(420));
+          R2EnemyYFlame[i] = 0;
         }
 
         for (int i=0; i<5; i++) {
           R3EnemyX[i]=0;
           R3EnemyY1[i]=floor(random(420));
+          R3EnemyY1Flame[i] = 0;
+          R3EnemyY2Flame[i] = 0;
+          R3EnemyY3Flame[i] = 0;
         }
 
         gameState = GAME_READY;
